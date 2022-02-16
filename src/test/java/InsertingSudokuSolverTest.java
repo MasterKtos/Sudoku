@@ -6,9 +6,10 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SudokuBoardTest {
+class InsertingSudokuSolverTest {
 	SudokuBoard board;
 	SudokuSolver solver;
+	int testRepeatCount = 10;
 
 	@BeforeEach
 	void setUp() {
@@ -17,30 +18,41 @@ class SudokuBoardTest {
 	}
 
 	@Test
-	void constructorTest() {
-		assertSame(solver, board.getSolver());
+	void solvedBoardDifferent() {
+		SudokuBoard board2 = board;
+		board2.solveGame();
+		for (int i = 0; i < testRepeatCount; i++) {
+			board = new SudokuBoard(solver);
+			solver.solve(board);
+			assertFalse(boardsSame(board, board2));
+			board2 = board;
+		}
 	}
 
 	@Test
-	void solvedGameCorrect() {
-		board.solveGame();
-		assertTrue(fieldsUnique(board));
+	void solvedBoardCorrect() {
+		for (int i = 0; i < testRepeatCount; i++) {
+			board.solveGame();
+			assertTrue(fieldsUnique(board));
+			board = new SudokuBoard(solver);
+		}
 	}
 
-	@Test
-	void getSetCorrect() {
-		board.set(1, 1, 5);
-		assertEquals(5, board.get(1, 1));
+
+
+
+	// helper functions
+	boolean boardsSame(SudokuBoard board1, SudokuBoard board2) {
+		int counter = 0;
+		for (int row = 0; row < 9; row++) {
+			for (int col = 0; col < 9; col++) {
+				if(board1.get(row, col) == board2.get(row, col))
+					counter++;
+			}
+		}
+		return counter == 81;
 	}
 
-	@Test
-	void toStringCorrect() {
-		var output = board.toString();
-		assertInstanceOf(String.class, output);
-		assertNotNull(output);
-	}
-
-	//helper functions
 	boolean fieldsUnique(SudokuBoard board) {
 		for (int i = 0; i < 9; i++) {
 			ArrayList<Integer> colNumbers = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9));
